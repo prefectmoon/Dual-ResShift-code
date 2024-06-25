@@ -1,0 +1,10 @@
+.DS_Store
+
+# PyCharm IDE
+.idea/
+
+# Python packaging
+__pycache__/
+
+# Output directory
+outputs/

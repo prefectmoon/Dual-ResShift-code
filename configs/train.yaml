@@ -1,0 +1,124 @@
+model:
+  target: models.sfunet.SuperResModel
+  ckpt_path: null
+  params:
+    image_size: 256
+    in_channels: 3
+    num_head_channels: 48
+    num_heads: 4
+    model_channels: 96
+    out_channels: 6
+    num_heads_upsample: -1
+    attention_resolutions: [8, 16, 32]
+    dropout: 0
+    num_res_blocks: 2
+    channel_mult: [1, 1, 2, 2, 3, 3]
+    use_checkpoint: False
+    conv_resample: True
+    dims: 2
+    use_fp16: False
+    use_scale_shift_norm: True
+    resblock_updown: True
+
+diffusion:
+  target: models.script_util.create_gaussian_diffusion
+  params:
+    sf: 4
+    schedule_name: exponential
+    schedule_kwargs:
+      power: 0.3
+    etas_end: 0.99
+    steps: 15
+    min_noise_level: 0.04
+    kappa: 2.0
+    weighted_mse: False
+    predict_type: xstart
+    timestep_respacing: ~
+    scale_factor: 1.0
+    normalize_input: True
+    latent_flag: True
+
+autoencoder:
+  target: ldm.models.autoencoder.VQModelTorch
+  ckpt_path: null
+#  ckpt_path: weights/autoencoder_vq_f4.pth
+  use_fp16: True
+  params:
+    embed_dim: 3
+    n_embed: 8192
+    ddconfig:
+      double_z: False
+      z_channels: 3
+      resolution: 256
+      in_channels: 3
+      out_ch: 3
+      ch: 128
+      ch_mult:
+      - 1
+      - 2
+      - 4
+      num_res_blocks: 2
+      attn_resolutions: []
+      dropout: 0.0
+      padding_mode: zeros
+
+degradation:
+  sf: 4
+  # the first degradation process
+  resize_prob: [0.2, 0.7, 0.1]  # up, down, keep
+  resize_range: [0.15, 1.5]
+  gaussian_noise_prob: 0.5
+  noise_range: [1, 30]
+  poisson_scale_range: [0.05, 3.0]
+  gray_noise_prob: 0.4
+  jpeg_range: [30, 95]
+
+  # the second degradation process
+  second_order_prob: 0.5
+  second_blur_prob: 0.8
+  resize_prob2: [0.3, 0.4, 0.3]  # up, down, keep
+  resize_range2: [0.3, 1.2]
+  gaussian_noise_prob2: 0.5
+  noise_range2: [1, 25]
+  poisson_scale_range2: [0.05, 2.5]
+  gray_noise_prob2: 0.4
+  jpeg_range2: [30, 95]
+
+  gt_size: 256
+  resize_back: False
+  use_sharp: False
+
+data:
+  train:
+    type: realesrgan
+    gt_data_dir: dataset/training/gt_training.npy
+    lq_data_dir: dataset/training/lq_training.npy
+    gbvs_data_dir: dataset/training/gbvs_training.npy
+  val:
+    gt_data_dir: dataset/vaild/gt.npy
+    lq_data_dir: dataset/vaild/lq.npy
+    gbvs_data_dir: dataset/vaild/gbvs.npy
+  test:
+    gt_data_dir: dataset/testing/gt.npy
+    lq_data_dir: dataset/testing/lq.npy
+    gbvs_data_dir: dataset/testing/gbvs.npy
+train:
+  current_step: 0
+  lr: 5e-5
+  batch: [64, 32]   # batchsize for training and validation [64, 8]
+  use_fp16: False
+  microbatch: 16
+  seed: 123456
+  global_seeding: False
+  prefetch_factor: 4
+  sf: 4
+  num_workers: 8
+  ema_rate: 0.999
+  iterations: 100000
+  milestones: [5000, 500000]
+  weight_decay: 0
+  save_freq: 5000
+  val_freq: 500000000
+  log_freq: [1000, 5000, 1] #[training loss, training images, val images]
+  save_images: True  # save the images of tensorboard logging
+  use_ema_val: True
