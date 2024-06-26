@@ -2,8 +2,8 @@
 
 ## Brief
 
-This is an implementation of Dual-ResShift by PyTorch. Thank you for your reading! We release processed test data and training models that you can test with our data and code. The code for the data processing and training parts will be released after our paper is accepted. (Our code is based on [This](https://github.com/zsyOAOA/ResShift)
-Model download address: [mode](https://drive.google.com/drive/folders/109UfiqeiBwjB-VopWsTDH9SA5GnJI-K8?usp=drive_link)
+This is an implementation of Dual-ResShift by PyTorch. Thank you for your reading! We release processed test data and training models that you can test with our data and code. The code for the data processing and training parts will be released after our paper is accepted. (Our code is based on [This](https://github.com/zsyOAOA/ResShift) \\
+Model download address: [mode](https://drive.google.com/drive/folders/109UfiqeiBwjB-VopWsTDH9SA5GnJI-K8?usp=drive_link) \\
 Test data download address: [test data](https://drive.google.com/drive/folders/1KeWI0IjmUjysVIyzs-mSOnZVUjQxgmZk?usp=drive_link)
 ## Usage
 
